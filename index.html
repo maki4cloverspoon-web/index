@@ -750,13 +750,20 @@ function render() {
   else if (currentType === "未完成") list = list.filter(s => s.tags.includes("未完成"));
 
 // 「すべて」表示時に同タイトル・同アーティストの重複を除去（タグ違いの同曲をまとめる）
-  if (currentType === "all") {
-    const seen = new Set();
-    list = list.filter(s => {
+ if (currentType === "all") {
+    const seen = new Map();
+    list.forEach(s => {
       const key = s.title + "|||" + s.artist;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+      if (seen.has(key)) {
+        // すでにある方にタグをマージする
+        const existing = seen.get(key);
+        existing.tags = [...new Set([...existing.tags, ...s.tags])];
+      } else {
+        seen.set(key, { ...s, tags: [...s.tags] });
+      }
+    });
+    list = [...seen.values()];
+  }
     });
   }
  
