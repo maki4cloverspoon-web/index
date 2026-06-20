@@ -813,9 +813,13 @@ function render() {
 
   container.innerHTML = orderedRows.map(row => {
     const rows = groups[row].map(s => {
-      const newTag  = s.tags.includes("新着")   ? '<span class="tag-new">NEW</span>'    : "";
-      const liveTag = s.tags.includes("生歌") && currentType !== "生歌"
-                      ? '<span class="tag-live">生歌</span>' : "";
+const newTag  = s.tags.includes("新着") ? '<span class="tag-new">NEW</span>' : "";
+      const both    = s.tags.includes("機材歌") && s.tags.includes("生歌");
+      const liveTag = currentType === "all"
+        ? (both ? '<span class="tag-live">機材歌・生歌</span>' : s.tags.includes("機材歌") ? '<span class="tag-live">機材歌</span>' : '<span class="tag-live">生歌</span>')
+        : currentType === "機材歌" && both ? '<span class="tag-live">生歌も可</span>'
+        : currentType === "生歌"   && both ? '<span class="tag-live">機材歌も可</span>'
+        : "";
       const wipTag  = s.tags.includes("未完成") ? '<span class="tag-wip">未完成</span>' : "";
       return `<a class="song-row" href="${ytUrl(s)}" target="_blank" rel="noopener">
         <span class="song-title">${s.title}${newTag}${liveTag}${wipTag}</span>
